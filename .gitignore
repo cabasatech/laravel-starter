@@ -1,0 +1,12 @@
+/nbproject
+/node_modules
+/public/fonts
+/public/storage
+/public/css
+/public/js
+/storage/*.key
+/vendor
+npm-debug.log
+.env
+composer.lock
+package-lock.json
