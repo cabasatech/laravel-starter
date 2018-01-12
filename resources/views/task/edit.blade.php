@@ -14,10 +14,9 @@
                         </div>
                     @endif
 
-                    <form class="form-horizontal" method="POST" action="{{ route('updateTask', [$task]) }}">
+                    <form class="form-horizontal" method="POST" action="{{ route('task.update', [$task->id]) }}">
                         {{ csrf_field() }}
                         {{ method_field('PUT') }}
-                        <input type="hidden" name="id" value="{{ $task->id }}" />
 
                         <div class="form-group{{ $errors->has('subject') ? ' has-error' : '' }}">
                             <label for="subject" class="col-md-4 control-label">Subject</label>

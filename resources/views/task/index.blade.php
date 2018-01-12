@@ -24,7 +24,7 @@
                             <th colspan="2">STATUS</th>
                         </tr>
                         </thead>
-                        <!--<tbody>-->
+                        <tbody>
                         @foreach ($tasks as $task)
                             <tr>
                                 <td>{{ $task->subject }}</td>
