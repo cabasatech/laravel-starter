@@ -19,24 +19,12 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get(
-    '/tasks', 'TaskController@index'
-);
-Route::get(
-    '/task/create', 'TaskController@create'
-);
-Route::post(
-    '/task', 'TaskController@store'
-);
-Route::get(
-    '/task/{task}', 'TaskController@show'
-)->name('showTask');
-Route::get(
-    '/task/{task}/edit', 'TaskController@edit'
-);
+Route::get('/tasks', 'TaskController@index')->name('tasks');
+Route::get('/task/create', 'TaskController@create')->name('task.create');
+Route::post('/task', 'TaskController@store')->name('task.store');
+Route::get('/task/{task}', 'TaskController@show')->name('task.show');
+Route::get('/task/{task}/edit', 'TaskController@edit')->name('task.edit');
 Route::match(['PUT', 'PATCH'], 
     '/task/{task}', 'TaskController@update'
-)->name('updateTask');
-Route::delete(
-    '/task/{task}', 'TaskController@destroy'
-);
+)->name('task.update');
+Route::delete('/task/{task}', 'TaskController@destroy')->name('task.destroy');

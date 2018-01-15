@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use App\Task;
 
 class TaskController extends Controller
@@ -16,14 +17,16 @@ class TaskController extends Controller
     |
     */
 
+    private $_view = [];
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Task $task)
+    public function __construct()
     {
-        $this->middleware('auth');
+        $this->_view = [];
     }
     
     /**
@@ -33,7 +36,9 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return view('task.index', ["tasks" => Task::all()]);
+        $this->_view['tasks'] = Task::all();
+
+        return view('task.index', $this->_view);
     }
 
     /**
@@ -43,87 +48,102 @@ class TaskController extends Controller
      */
     public function create()
     {
-        return view('task.create');
+        return view('task.create', $this->_view);
     }
 
     /**
      * Store a newly created task in database.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request 
+     * 
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'subject' => 'required'
-        ]);
+        $request->validate(
+            [
+                'subject' => 'required'
+            ]
+        );
         
-        $task = new Task();
-        
-        $task->subject = $request->subject;
-        $task->description = $request->description;
-        
-        $task->save();
+        $task = Task::create(
+            [
+                'subject' => $request->subject,
+                'description' => $request->description
+            ]
+        );
         
         session()->flash('status', 'Task created successfully.');
-        return redirect()->route('showTask', [$task]);
+        return redirect()->route('task.show', [$task->id]);
     }
 
     /**
      * Display the specified task.
      *
-     * @param  int  $id
+     * @param Task $task 
+     * 
      * @return \Illuminate\Http\Response
      */
     public function show(Task $task)
     {
-        return view('task.show', ['task' => $task]);
+        $this->_view['task'] = $task;
+
+        return view('task.show', $this->_view);
     }
 
     /**
      * Show the form for editing the specified task.
      *
-     * @param  int  $id
+     * @param Task $task 
+     * 
      * @return \Illuminate\Http\Response
      */
     public function edit(Task $task)
     {
-        return view('task.edit', ['task' => $task]);
+        $this->_view['task'] = $task;
+
+        return view('task.edit', $this->_view);
     }
 
     /**
      * Update the specified task in database.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request 
+     * @param Task                     $task 
+     * 
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Task $task)
     {
-        $request->validate([
-            'subject' => 'required'
-        ]);
+        $request->validate(
+            [
+                'subject' => 'required'
+            ]
+        );
 
-        $task->subject = $request->subject;
-        $task->description = $request->description;
-        
-        $task->save();
+        $task->fill(
+            [
+                'subject' => $request->subject,
+                'description' => $request->description
+            ]
+        )->update();
         
         session()->flash('status', 'Task updated successfully.');
-        return redirect()->route('showTask', [$task]);
+        return redirect()->route('task.show', [$task->id]);
     }
 
     /**
      * Remove the specified task.
      *
-     * @param  int  $id
+     * @param Task $task 
+     * 
      * @return \Illuminate\Http\Response
      */
     public function destroy(Task $task)
     {
-//        $task->delete();
+        $task->delete();
         
         session()->flash('status', 'Task deleted successfully.');
-        return redirect()->route('showTask', [$task]);
+        return redirect()->route('tasks');
     }
 }
