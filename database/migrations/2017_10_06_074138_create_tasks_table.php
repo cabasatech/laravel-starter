@@ -13,17 +13,19 @@ class CreateTasksTable extends Migration
      */
     public function up()
     {
-        Schema::create('tasks', function (Blueprint $table) {
-            $table->increments('id');
-            
-            $table->string('subject');
-            $table->string('description')->nullable();
-            $table->timestamp('started_on')->nullable();
-            $table->timestamp('completed_on')->nullable();
-            $table->enum('status', ['PENDING', 'IN_PROGRESS', 'COMPLETED'])->default('PENDING');
-            
-            $table->timestamps();
-        });
+        Schema::create(
+            'tasks', function (Blueprint $table) {
+                $table->increments('id');
+                
+                $table->string('subject');
+                $table->string('description')->nullable();
+                $table->timestamp('started_on')->nullable();
+                $table->timestamp('completed_on')->nullable();
+                $table->enum('status', ['PENDING', 'IN_PROGRESS', 'COMPLETED'])->default('PENDING');
+                
+                $table->timestamps();
+            }
+        );
     }
 
     /**
