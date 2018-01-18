@@ -29,4 +29,4 @@ Route::get('/task/{task}/edit', 'TaskController@edit')->name('task.edit');
 Route::match(
     ['PUT', 'PATCH'], '/task/{task}', 'TaskController@update'
 )->name('task.update');
-Route::delete('/task/{task}', 'TaskController@destroy')->name('task.destroy');
+Route::get('/task/{task}/delete', 'TaskController@destroy')->name('task.destroy');

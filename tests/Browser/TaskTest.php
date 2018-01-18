@@ -17,7 +17,6 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-use DB;
 use Session;
 
 use App\Task;
@@ -37,52 +36,53 @@ class TaskTest extends DuskTestCase
 {
     use DatabaseMigrations;
 
-    private $_subject, $_description;
-
-    /**
-     * Setting up test
-     * 
-     * @return void
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->_subject = 'Test subject';
-        $this->_description = 'Test description';
-    }
-
     /**
      * Creating task (Browser)
      * 
-     * @testdox Creating task (Browser)
+     * @param string $subject 
+     * @param string $description 
+     * 
+     * @testdox      Creating task (Browser)
+     * @dataProvider createTaskDataProvider
      *
-     * @return Task
+     * @return void
      */
-    public function testCreateTaskPage()
+    public function testCreateTaskPage($subject, $description)
     {
         $this->browse(
-            function (Browser $browser) {
+            function (Browser $browser) use ($subject, $description) {
                 $browser->visit('/task/create')
                     ->waitForLocation('/task/create')
-                    ->type('subject', $this->_subject)
-                    ->type('description', $this->_description)
-                    ->press('Create')
-                    ->waitForLocation('/task/1')
-                    ->assertSeeIn('.alert-success', 'Task created successfully.');
+                    ->type('subject', $subject)
+                    ->type('description', $description)
+                    ->press('Create');
+
+                if (!empty($subject)) {
+                    $browser->waitForLocation('/task/1')
+                        ->assertSeeIn(
+                            '.alert-success', 
+                            'Task created successfully.'
+                        );
+
+                    $this->assertDatabaseHas(
+                        'tasks', [
+                            'subject' => $subject, 'description' => $description
+                        ]
+                    );
+                } else {
+                    $browser->assertSeeIn(
+                        '.invalid-feedback',
+                        'The subject field is required.'
+                    );
+
+                    $this->assertDatabaseMissing(
+                        'tasks', [
+                            'subject' => $subject, 'description' => $description
+                        ]
+                    );
+                }
             }
         );
-
-        $task = Task::where(
-            [
-                'subject' => $this->_subject,
-                'description' => $this->_description
-            ]
-        );
-
-        $this->assertTrue($task->exists());
-
-        return $task->first();
     }
 
     /**
@@ -109,119 +109,176 @@ class TaskTest extends DuskTestCase
         $response = $this->call('POST', '/task', $requestData);
         unset($requestData['_token']);
 
-        // if (!empty($subject) && !empty($description)) {
-        //     $response->assertRedirect('/task/1');
-        //     $response->assertSessionHas('status', 'Task created successfully.');
-        //     $response->assertSessionMissing('errors');
-
-        //     $this->assertDatabaseHas('tasks', $requestData);
-        // } elseif (!empty($subject) && empty($description)) {
-        //     $response->assertRedirect('/task/1');
-        //     $response->assertSessionHas('status', 'Task created successfully.');
-        //     $response->assertSessionMissing('errors');
-
-        //     $this->assertDatabaseHas('tasks', $requestData);
-        // } elseif (empty($subject) && !empty($description)) {
-        //     $response->assertSessionHasErrors(['subject']);
-            
-        //     $this->assertDatabaseMissing('tasks', $requestData);
-        // } else {
-        //     $response->assertSessionHasErrors(['subject']);
-
-        //     $this->assertDatabaseMissing('tasks', $requestData);
-        // }
-
         if (!empty($subject)) {
+            $this->assertDatabaseHas('tasks', $requestData);
+
             $response->assertRedirect('/task/1');
             $response->assertSessionHas('status', 'Task created successfully.');
             $response->assertSessionMissing('errors');
-
-            $this->assertDatabaseHas('tasks', $requestData);
         } else {
-            $response->assertSessionHasErrors(['subject']);
-
             $this->assertDatabaseMissing('tasks', $requestData);
+
+            $response->assertSessionHas('errors');
+            $response->assertSessionHasErrors(['subject']);
         }
     }
 
     /**
      * Editing task (Browser)
      * 
-     * @param string $newSubject 
-     * @param string $newDescription 
-     * @param Task   $createdTask    Task created in testCreateTaskPage()
-     * 
+     * @param string $oldSubject 
+     * @param string $oldDescription 
+     * @param string $subject 
+     * @param string $description 
+     *
      * @testdox      Editing task (Browser)
      * @dataProvider updateTaskDataProvider
-     * @depends      testCreateTaskPage
      * 
      * @return void
      */
     public function testEditTaskPage(
-        string $newSubject, 
-        string $newDescription, 
-        Task $createdTask
+        $oldSubject, $oldDescription, 
+        $subject, $description
     ) {
-        $task = Task::create($createdTask->toArray());
+        $oldData = ['subject' => $oldSubject, 'description' => $oldDescription];
+        $task = factory(Task::class)->create($oldData);
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
 
         $this->browse(
-            function (Browser $browser) use ($task, $newSubject, $newDescription) {
+            function (Browser $browser) use ($task, $subject, $description) {
                 $browser->visit('/task/'.$task->id.'/edit')
                     ->waitForLocation('/task/'.$task->id.'/edit')
                     ->assertInputValue('subject', $task->subject)
                     ->assertInputValue('description', $task->description)
-                    ->type('subject', $newSubject)
-                    ->type('description', $newDescription)
-                    ->press('Update')
-                    ->waitForLocation('/task/'.$task->id)
-                    ->assertSeeIn('.alert-success', 'Task updated successfully.');
-            }
-        );
+                    ->type('subject', $subject)
+                    ->type('description', $description)
+                    ->press('Update');
 
-        $this->assertDatabaseHas(
-            'tasks', [
-                'id' => $task->id,
-                'subject' => $newSubject,
-                'description' => $newDescription
-            ]
+                if (!empty($subject)) {
+                    $browser->waitForLocation('/task/'.$task->id)
+                        ->assertSeeIn(
+                            '.alert-success', 
+                            'Task updated successfully.'
+                        );
+
+                    $this->assertDatabaseHas(
+                        'tasks', [
+                            'id' => $task->id, 
+                            'subject' => $subject, 
+                            'description' => $description
+                        ]
+                    );
+                } else {
+                    $this->assertDatabaseMissing(
+                        'tasks', [
+                            'id' => $task->id, 
+                            'subject' => $subject, 
+                            'description' => $description
+                        ]
+                    );
+                }
+            }
         );
     }
 
     /**
-     * Deleting task
+     * Update an existing task to database
      * 
-     * @param Task $createdTask Task created in testCreateTask().
+     * @param string $oldSubject 
+     * @param string $oldDescription 
+     * @param string $subject 
+     * @param string $description 
      * 
-     * @testdox Deleting task
-     * @depends testCreateTask
+     * @testdox      Update an existing task to database
+     * @dataProvider updateTaskDataProvider
      * 
      * @return void
      */
-    // public function testDeleteTask(Task $createdTask)
-    // {
-    //     $task = Task::create($createdTask->toArray());
-        
-    //     $task->delete();
+    public function testUpdateTask(
+        $oldSubject, $oldDescription, 
+        $subject, $description
+    ) {
+        Session::start();
 
-    //     $this->assertSoftDeleted(
-    //         'tasks', ['subject' => $task->toArray()]
-    //     );
-    // }
+        $oldData = ['subject' => $oldSubject, 'description' => $oldDescription];
+        $task = factory(Task::class)->create($oldData);
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
+        
+        $requestData = [
+            '_token' => csrf_token(),
+            'subject' => $subject,
+            'description' => $description
+        ];
+
+        $response = $this->call('PUT', '/task/'.$task->id, $requestData);
+        unset($requestData['_token']);
+
+        if (!empty($subject)) {
+            $this->assertDatabaseHas('tasks', $requestData);
+
+            $response->assertRedirect('/task/'.$task->id);
+            $response->assertSessionHas('status', 'Task updated successfully.');
+            $response->assertSessionMissing('errors');
+        } else {
+            $this->assertDatabaseMissing('tasks', $requestData);
+
+            $response->assertSessionHasErrors(['subject']);
+        }
+    }
 
     /**
-     * Provides data to update Task
+     * Destroying an existing Task from database
+     * 
+     * @param string $subject 
+     * @param string $description 
+     * 
+     * @testdox  Destroying an existing Task from database
+     * @testWith ["Subject 1", "Description 1"]
+     * 
+     * @return void
+     */
+    public function testDestroyTask($subject, $description)
+    {
+        $task = Task::create(
+            ['subject' => $subject, 'description' => $description]
+        );
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
+        
+        $response = $this->call(
+            "GET", '/task/1/delete', [
+                '_token' => csrf_token()
+            ]
+        );
+
+        $this->assertSoftDeleted(
+            'tasks', ['id' => $task->id]
+        );
+
+        $response->assertRedirect('/tasks');
+        $response->assertSessionHas('status', 'Task deleted successfully.');
+        $response->assertSessionMissing('errors');
+    }
+
+    /**
+     * Provides data to update an existing Task
      * 
      * @return array
      */
     public function updateTaskDataProvider()
     {
         return [
-            ['Subject 1', 'Description 1']
+            [
+                'New subject 1', 'New description 1', 
+                'Updated subject 1', 'Updated description 1'
+            ],
+            ['New subject 2', 'New description 2', 'Updated subject 2', null],
+            ['New subject 3', 'New description 3', null, 'Updated description 3'],
+            ['New subject 4', 'New description 4', null, null]
         ];
     }
 
     /**
-     * Provides data to create Task
+     * Provides data to create a new Task
      * 
      * @return array
      */

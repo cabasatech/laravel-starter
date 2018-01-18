@@ -35,8 +35,10 @@
                                     <td>{{ $task->completed_on or '-' }}</td>
                                     <td>{{ $task->status }}</td>
                                     <td>
-                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                        <form action='{{ route("task.destroy", [$task->id]) }}' method="GET">
+                                            {{ csrf_field() }}
+                                            <button type="submit" class="btn btn-link">Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @endforeach

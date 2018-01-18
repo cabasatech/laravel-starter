@@ -135,11 +135,12 @@ class TaskController extends Controller
     /**
      * Remove the specified task.
      *
-     * @param Task $task 
+     * @param \Illuminate\Http\Request $request 
+     * @param Task                     $task 
      * 
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Task $task)
+    public function destroy(Request $request, Task $task)
     {
         $task->delete();
         

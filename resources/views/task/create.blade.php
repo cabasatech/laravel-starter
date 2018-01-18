@@ -9,19 +9,19 @@
 
                 <div class="card-body">
                     @if (session('status'))
-                        <div class="alert alert-success">
-                            {{ session('status') }}
-                        </div>
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
                     @endif
 
-                    <form class="form-horizontal{{ $errors->all() ? ' was-validated' : '' }}" method="POST" action="{{ route('task.store') }}">
+                    <form novalidate class="form-horizontal{{ $errors->all() ? ' was-validated' : '' }}" method="POST" action="{{ route('task.store') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group row{{ $errors->has('subject') ? ' is-invalid' : '' }}">
                             <label for="subject" class="col-md-3 col-form-label">Subject:</label>
 
                             <div class="col-md-7">
-                                <input id="subject" type="text" class="form-control" name="subject" value="{{ old('subject') }}" autofocus>
+                                <input id="subject" type="text" class="form-control" name="subject" value="{{ old('subject') }}" required autofocus>
 
                                 @if ($errors->has('subject'))
                                 <span class="invalid-feedback">{{ $errors->first('subject') }}</span>
