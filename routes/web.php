@@ -11,9 +11,11 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get(
+    '/', function () {
+        return view('welcome');
+    }
+);
 
 Auth::routes();
 
@@ -24,7 +26,7 @@ Route::get('/task/create', 'TaskController@create')->name('task.create');
 Route::post('/task', 'TaskController@store')->name('task.store');
 Route::get('/task/{task}', 'TaskController@show')->name('task.show');
 Route::get('/task/{task}/edit', 'TaskController@edit')->name('task.edit');
-Route::match(['PUT', 'PATCH'], 
-    '/task/{task}', 'TaskController@update'
+Route::match(
+    ['PUT', 'PATCH'], '/task/{task}', 'TaskController@update'
 )->name('task.update');
 Route::delete('/task/{task}', 'TaskController@destroy')->name('task.destroy');

@@ -21,7 +21,7 @@
                             <label for="subject" class="col-md-3 col-form-label">Subject:</label>
 
                             <div class="col-md-7">
-                                <input id="subject" type="text" class="form-control" name="subject" value="{{ old('subject') }}" required autofocus>
+                                <input id="subject" type="text" class="form-control" name="subject" value="{{ old('subject') }}" autofocus>
 
                                 @if ($errors->has('subject'))
                                 <span class="invalid-feedback">{{ $errors->first('subject') }}</span>

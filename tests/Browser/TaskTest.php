@@ -17,6 +17,9 @@ use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
+use DB;
+use Session;
+
 use App\Task;
 
 /**
@@ -50,13 +53,13 @@ class TaskTest extends DuskTestCase
     }
 
     /**
-     * Creating task
+     * Creating task (Browser)
      * 
-     * @testdox Creating task
+     * @testdox Creating task (Browser)
      *
      * @return Task
      */
-    public function testCreateTask()
+    public function testCreateTaskPage()
     {
         $this->browse(
             function (Browser $browser) {
@@ -70,35 +73,91 @@ class TaskTest extends DuskTestCase
             }
         );
 
-        $this->assertDatabaseHas(
-            'tasks', [
+        $task = Task::where(
+            [
                 'subject' => $this->_subject,
                 'description' => $this->_description
             ]
         );
 
-        return Task::where(
-            [
-                'subject' => $this->_subject,
-                'description' => $this->_description
-            ]
-        )->first();
+        $this->assertTrue($task->exists());
+
+        return $task->first();
     }
 
     /**
-     * Editing task
+     * Store task to database
      * 
-     * @param string $newSubject 
-     * @param string $newDescription 
-     * @param Task   $createdTask    Task created in testCreateTask().
+     * @param string $subject 
+     * @param string $description 
      * 
-     * @testdox      Editing task
-     * @dataProvider updateTaskDataProvider
-     * @depends      testCreateTask
+     * @testdox      Store task to database
+     * @dataProvider createTaskDataProvider
      * 
      * @return void
      */
-    public function testEditTask(
+    public function testStoreTask($subject, $description)
+    {
+        Session::start();
+
+        $requestData = [
+            '_token' => csrf_token(),
+            'subject' => $subject,
+            'description' => $description
+        ];
+
+        $response = $this->call('POST', '/task', $requestData);
+        unset($requestData['_token']);
+
+        // if (!empty($subject) && !empty($description)) {
+        //     $response->assertRedirect('/task/1');
+        //     $response->assertSessionHas('status', 'Task created successfully.');
+        //     $response->assertSessionMissing('errors');
+
+        //     $this->assertDatabaseHas('tasks', $requestData);
+        // } elseif (!empty($subject) && empty($description)) {
+        //     $response->assertRedirect('/task/1');
+        //     $response->assertSessionHas('status', 'Task created successfully.');
+        //     $response->assertSessionMissing('errors');
+
+        //     $this->assertDatabaseHas('tasks', $requestData);
+        // } elseif (empty($subject) && !empty($description)) {
+        //     $response->assertSessionHasErrors(['subject']);
+            
+        //     $this->assertDatabaseMissing('tasks', $requestData);
+        // } else {
+        //     $response->assertSessionHasErrors(['subject']);
+
+        //     $this->assertDatabaseMissing('tasks', $requestData);
+        // }
+
+        if (!empty($subject)) {
+            $response->assertRedirect('/task/1');
+            $response->assertSessionHas('status', 'Task created successfully.');
+            $response->assertSessionMissing('errors');
+
+            $this->assertDatabaseHas('tasks', $requestData);
+        } else {
+            $response->assertSessionHasErrors(['subject']);
+
+            $this->assertDatabaseMissing('tasks', $requestData);
+        }
+    }
+
+    /**
+     * Editing task (Browser)
+     * 
+     * @param string $newSubject 
+     * @param string $newDescription 
+     * @param Task   $createdTask    Task created in testCreateTaskPage()
+     * 
+     * @testdox      Editing task (Browser)
+     * @dataProvider updateTaskDataProvider
+     * @depends      testCreateTaskPage
+     * 
+     * @return void
+     */
+    public function testEditTaskPage(
         string $newSubject, 
         string $newDescription, 
         Task $createdTask
@@ -129,6 +188,27 @@ class TaskTest extends DuskTestCase
     }
 
     /**
+     * Deleting task
+     * 
+     * @param Task $createdTask Task created in testCreateTask().
+     * 
+     * @testdox Deleting task
+     * @depends testCreateTask
+     * 
+     * @return void
+     */
+    // public function testDeleteTask(Task $createdTask)
+    // {
+    //     $task = Task::create($createdTask->toArray());
+        
+    //     $task->delete();
+
+    //     $this->assertSoftDeleted(
+    //         'tasks', ['subject' => $task->toArray()]
+    //     );
+    // }
+
+    /**
      * Provides data to update Task
      * 
      * @return array
@@ -137,6 +217,21 @@ class TaskTest extends DuskTestCase
     {
         return [
             ['Subject 1', 'Description 1']
+        ];
+    }
+
+    /**
+     * Provides data to create Task
+     * 
+     * @return array
+     */
+    public function createTaskDataProvider()
+    {
+        return [
+            ['New subject 1', 'New description 1'],
+            ['New subject 2', null],
+            [null, 'New description 3'],
+            [null, null]
         ];
     }
 }
