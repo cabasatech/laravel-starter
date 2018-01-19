@@ -239,7 +239,7 @@ class TaskTest extends DuskTestCase
      */
     public function testDestroyTask($subject, $description)
     {
-        $task = Task::create(
+        $task = factory(Task::class)->create(
             ['subject' => $subject, 'description' => $description]
         );
         $this->assertDatabaseHas('tasks', ['id' => $task->id]);
