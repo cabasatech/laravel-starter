@@ -1,53 +1,49 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+<!-- <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p> -->
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## About Laravel Starter
 
-## About Laravel
+"laravel-starter" is a repo to help you start Laravel project with minimum configuration. It already comes with Bootstrap 4.0 Beta (SASS) installed.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+## Getting Started
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- ### Download:
+  - Download "laravel-starter" ZIP archive by clicking [here](https://github.com/cabasatech/laravel-starter/archive/master.zip).
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications. A superb combination of simplicity, elegance, and innovation give you tools you need to build any application with which you are tasked.
+- ### Clone using SSH: ( **Recommended** )
+  - `git clone git@github.com:cabasatech/laravel-starter.git [<project_name>]`
 
-## Learning Laravel
+- ### Clone using HTTPS:
+  - `git clone https://github.com/cabasatech/laravel-starter.git [<project_name>]`
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is thorough, complete, and makes it a breeze to get started learning the framework.
+## Prerequisites
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 900 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+- [PHP 7.0.0](http://php.net/downloads.php) or greater with OpenSSL, PDO, Mbstring, Tokenizer, XML extensions.
+- Web Server (i.e. [Apache](https://httpd.apache.org/) or [Engine-X](https://nginx.org/))
+- [Node.js 8.9.4](https://nodejs.org/en/download/) or greater to install JavaScript dependencies.
+- [Composer](https://getcomposer.org/) to install PHP dependencies.
 
-## Laravel Sponsors
+## Installing
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](http://patreon.com/taylorotwell):
+- Clone the project using any of above given instructions to your desired directory.
+- Go to root of the project.
+- Run `composer install` to install PHP dependencies.
+- Run `npm install` to install JavaScript dependencies.
+- Run `npm run dev` to compile JavaScript assets required to run application.
 
-- **[Vehikl](http://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Styde](https://styde.net)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
+## Tests
 
-## Contributing
+Laravel Dusk is already installed and configured to test your application. Please refer to **[Laravel Testing Docs](https://laravel.com/docs/5.5/testing/)** for testing application. It is pre-configured with **[PHPUnit](https://phpunit.de/)**.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+## Built Using
 
-## Security Vulnerabilities
+- **[Laravel 5.5](https://laravel.com/docs/5.5/)** - Laravel Framework
+- **[Bootstrap 4](https://getbootstrap.com/)** - Bootstrap (SASS)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+## Authors
+
+- **[Cabasa Technologies](http://cabasatech.com/)**
+> We aim to built great products, We believe in quality work, and We love to explore new technologies.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+The "laravel-starter" is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
